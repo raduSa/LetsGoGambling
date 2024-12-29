@@ -39,12 +39,6 @@ w & j & t & q
 \end{pmatrix}
 $$
 
-For the expected values of both random variables to be equal, then
-
-$$
-b = \frac {w + 1.5j}{w + j + t}
-$$
-
 So the bet is equal to the expected value of the next game / payoff (can consider =1) 
 
 
