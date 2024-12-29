@@ -73,6 +73,15 @@ def simulate_hand(deck):
     # Deal hands
     player_hand = [deck.pop(0), deck.pop(0)]
     dealer_hand = [deck.pop(0), deck.pop(0)]
+
+    # check for blackjack -> has 3:2 returns
+    if sum(player_hand) == 21:
+        if sum(dealer_hand) == 21:
+            return 0
+        else:
+            return 1.5
+
+    # save dealers up-card -> matters for playing perfect strategy
     up_card = dealer_hand[0]
 
     # check if player hand is soft total
@@ -83,6 +92,7 @@ def simulate_hand(deck):
     # Player plays
 
     player_value = hand_value(player_hand)
+
     #print(player_hand, player_value)
 
     if is_soft_total:
@@ -128,28 +138,47 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
     # get results
     results = np.vectorize(simulate_hand, signature="(n)->()")(decks)
 
-    #print(results)
+    wins = np.count_nonzero(results == 1)
+    losses = np.count_nonzero(results == -1)
+    blackjack = np.count_nonzero(results == 1.5)
+    ties = np.count_nonzero(results == 0)
+    p_win = wins / num_simulations
+    p_loss = losses / num_simulations
+    p_blackjack = blackjack / num_simulations
+    p_tie = ties / num_simulations
+    print(f"Wins: {wins}, Losses: {losses}, BlackJacks: {blackjack}")
     # Calculate expected value
     ev = np.sum(results) / num_simulations
-    return ev
+    var = (
+            (p_win * (1 - ev) ** 2) +
+            (p_blackjack * (1.5 - ev) ** 2) +
+            (p_loss * (-1 - ev) ** 2) +
+            (p_tie * (0 - ev) ** 2)
+    )
+    return ev, var
 
 
 
 # Define parameters
-num_simulations = 10000
-num_hands = 500
+num_simulations = 1153
+num_hands = 100
 initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4
+bankroll = 100000
 
 # Run simulation and print results
-avg = 0
+avg_ev = 0
+avg_var = 0
 Max = -1
 Min = float('inf')
 for _ in range(num_hands):
-    expected_value = monte_carlo_blackjack(initial_deck, num_simulations)
+    expected_value, variance = monte_carlo_blackjack(initial_deck, num_simulations)
     Max = max(Max, expected_value)
     Min = min(Min, expected_value)
-    avg += expected_value
-    #print(f"Expected Value of the Next Bet: {expected_value:.4f}")
+    avg_ev += expected_value
+    avg_var += variance
+    print(f"ev: {expected_value}, var: {variance}")
+    print(f"Expected Value of the Next Bet: {bankroll * expected_value / variance}")
 
-print(f"Average ev over {num_hands} hands: {avg / num_hands}")
+print(f"Average ev over {num_hands} hands: {avg_ev / num_hands}")
+print(f"Average var over {num_hands} hands: {avg_var / num_hands}")
 print(f"Max: {Max}, Min: {Min}")
