@@ -39,6 +39,7 @@ w & j & t & q
 \end{pmatrix}
 $$
 
-So the bet is equal to the expected value of the next game / payoff (can consider =1) 
+We will use the formula for the bet percentage: Ev / Var , as it is a good approximation
 
-
+https://wizardofodds.com/gambling/kelly-criterion/
+https://www.blackjackreview.com/wp/archives/red-taylor-kelly-criterion-faq/
