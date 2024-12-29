@@ -13,6 +13,42 @@ import random
 from copy import deepcopy
 import numpy as np
 
+# perfect strategy tables
+hard_totals = {
+    21: ['s'] * 10,
+    20: ['s'] * 10,
+    19: ['s'] * 10,
+    18: ['s'] * 10,
+    17: ['s'] * 10,
+    16: ['s'] * 5 + ['h'] * 5,
+    15: ['s'] * 5 + ['h'] * 5,
+    14: ['s'] * 5 + ['h'] * 5,
+    13: ['s'] * 5 + ['h'] * 5,
+    12: ['h'] * 2 + ['s'] * 3 + ['h'] * 5,
+    11: ['h'] * 10,
+    10: ['h'] * 10,
+    9: ['h'] * 10,
+    8: ['h'] * 10,
+    7: ['h'] * 10,
+    6: ['h'] * 10,
+    5: ['h'] * 10,
+    4: ['h'] * 10,
+    3: ['h'] * 10,
+    2: ['h'] * 10,
+}
+
+soft_totals = {
+    21: ['s'] * 10,
+    20: ['s'] * 10,
+    19: ['s'] * 10,
+    18: ['s'] * 7 + ['h'] * 3,
+    17: ['h'] * 10,
+    16: ['h'] * 10,
+    15: ['h'] * 10,
+    14: ['h'] * 10,
+    13: ['h'] * 10,
+}
+
 
 # Function to simulate one blackjack hand
 def simulate_hand(deck):
@@ -22,6 +58,9 @@ def simulate_hand(deck):
         if value > 21 and 11 in hand:
             hand[hand.index(11)] = 1
             value = sum(hand)
+            # hand is no longer soft total (ace value was switched to 1)
+            nonlocal is_soft_total
+            is_soft_total = False
         return value
 
     def dealer_play(deck, dealer_hand):
@@ -34,11 +73,34 @@ def simulate_hand(deck):
     # Deal hands
     player_hand = [deck.pop(0), deck.pop(0)]
     dealer_hand = [deck.pop(0), deck.pop(0)]
+    up_card = dealer_hand[0]
 
-    # Player plays (simple strategy: hit until 17 or more)
-    while hand_value(player_hand) < 17:
-        player_hand.append(deck.pop(0))
+    # check if player hand is soft total
+    # if the hand has an ace that can be counted as an 11, it is a soft total
+    # otherwise the hand is a hard total
+    is_soft_total = (11 in player_hand and sum(player_hand) <= 21)
+
+    # Player plays
+
     player_value = hand_value(player_hand)
+    #print(player_hand, player_value)
+
+    if is_soft_total:
+        curr_move = soft_totals[player_value][up_card - 2]
+    else:
+        curr_move = hard_totals[player_value][up_card - 2]
+
+    while curr_move == 'h':
+        player_hand.append(deck.pop(0))
+        player_value = hand_value(player_hand)
+        if player_value > 21:
+            # busted
+            break
+
+        if is_soft_total:
+            curr_move = soft_totals[player_value][up_card - 2]
+        else:
+            curr_move = hard_totals[player_value][up_card - 2]
 
     # If player busts
     if player_value > 21:
@@ -80,7 +142,7 @@ initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4
 
 # Run simulation and print results
 avg = 0
-Max = 0
+Max = -1
 Min = float('inf')
 for _ in range(num_hands):
     expected_value = monte_carlo_blackjack(initial_deck, num_simulations)
