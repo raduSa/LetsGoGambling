@@ -49,11 +49,6 @@ soft_totals = {
 
 # Function to simulate one blackjack hand
 def simulate_hand(deck):
-
-    # max count of cards for a hand (1 player):
-    # player: 4 * 1 + 4 * 2 + 3 * 3 | dealer: 3 + 4 * 4   ->   16
-    deck = np.random.choice(deck, size=16, replace=True)
-
     def hand_value(hand):
         value = sum(hand)
         # Adjust for aces
@@ -132,20 +127,19 @@ def simulate_hand(deck):
 
 # Function for Monte Carlo Simulation
 def monte_carlo_blackjack(deck, num_simulations=1000):
-    '''# create num_simulations copies of deck
-    decks = np.tile(deck, (num_simulations, 1))
-    # shuffle all the decks differently
-    for i in range(num_simulations):
-        np.random.shuffle(decks[i])
-    # get results
-    results = np.vectorize(simulate_hand, signature="(n)->()")(decks)'''
+    # max count of cards for a hand (1 player):
+    # player: 4 * 1 + 4 * 2 + 3 * 3 | dealer: 3 + 4 * 4   ->   16
+
+    # create num_simulations copies of deck (simulate only 16 cards per deck)
+    decks = np.random.choice(deck, size=(num_simulations, 16), replace=True)
 
     results = list()
-    for _ in range(num_simulations):
-        results.append(simulate_hand(deck))
+    for curr_deck in decks:
+        results.append(simulate_hand(curr_deck))
 
     #print(results)
     results = np.array(results)
+
     wins = np.count_nonzero(results == 1)
     losses = np.count_nonzero(results == -1)
     blackjack = np.count_nonzero(results == 1.5)
@@ -168,7 +162,9 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
 
 
 # Define parameters
-num_simulations = 115377 # epsilon = 0.01
+# epsilon = 0.01 -> 115377
+# epsilon = 0.1 -> 1153
+num_simulations = 115377
 num_hands = 100
 initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4
 bankroll = 100000
