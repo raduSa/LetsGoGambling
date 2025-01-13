@@ -66,6 +66,10 @@ to compute the equivalent expected value and variation of that hand.
 
 ## Bet sizing
 
+Kelly criterion is a formula for sizing a sequence of bets by maximizing the
+long-term expected value of the logarithm of wealth, which is equivalent to
+maximizing the long-term expected geometric growth rate
+
 If we were to play Blackjack and we could only lose everything or win the
 amount we betted (b >= 1) we could use Kelly criterion to choose our bet size:
 
@@ -101,6 +105,26 @@ w & j & t & q
 \end{pmatrix}
 $$
 
+Certainty Equivalent (CE) provides a way to compare different bets.
+The bet with the highest CE is the one you want to make, unless all bets have a
+negative CE in which case you should not bet at all. For a typical hand of blackjack,
+the amount you expect to win, on average, is some advantage "a" times the amount
+bet with a variance equal to some value "u" times the square of the amount bet.
+To maximize the CE you must maximize
+
+$$CE = ba – (b^2)u / 2kB$$
+
+where "b" is the size of the bet. A very little calculus shows that this is maximized when
+
+$$b = akB / u$$
+
+if "a" is positive. (If "a" is not positive you should bet as little as possible.)
+A quick calculation shows that your CE will be negative if you bet more than twice
+your optimal bet.
+It is better not to bet than to bet more than twice the optimal amount.
+Also notice that for an optimal bet the CE is precisely half the expected winnings, E.
+This will be discussed in more detail below.
+
 So in this case we will use Ev / Var to choose our bet percentage as it is a good
 approxmiation.
 
@@ -130,3 +154,4 @@ expected value of -0.02 fast.
 - https://www.blackjackreview.com/wp/archives/red-taylor-kelly-criterion-faq/
 - https://graphics.stanford.edu/~billyc/class/vis_win0304/as2/
 - https://i.bojoko.com/25/c7e2777d_1000x1330.876e5ac5f344d22c4b27d59d1b8ae5d8/blackjack-basic-strategy-chart.png
+- https://en.wikipedia.org/wiki/Kelly_criterion
