@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+
 card_count = 0
 # How much to bet based on the true count
 bet_percentage_bankroll = {
@@ -195,7 +197,7 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
     p_loss = losses / num_simulations
     p_blackjack = blackjack / num_simulations
     p_tie = ties / num_simulations
-    print(f"Wins: {wins}, Losses: {losses}, BlackJacks: {blackjack}")
+    # print(f"Wins: {wins}, Losses: {losses}, BlackJacks: {blackjack}")
 
     # Calculate expected value
     ev = np.sum(results) / num_simulations
@@ -229,7 +231,6 @@ def play_match(deck, bankroll, num_simulations):
 # epsilon = 0.1 -> 1153
 num_simulations = 115377
 num_hands = 100
-initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4 * 4
 
 bankroll_default = 100_000
 bankroll_count = 100_000
@@ -254,16 +255,49 @@ min_ev = float('inf')
 print(f"Average var over {num_hands} hands: {avg_var / num_hands}")
 print(f"Max ev: {max_ev}, Min ev: {min_ev}")'''
 
-nr_matches = 1
-for _ in range(nr_matches):
+counting_results = []
+monte_carlo_results = []
+
+nr_matches = 5
+for i in range(nr_matches):
+    print(f"Playing match: [{i}]")
+    initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4 * 4
+
     np.random.shuffle(initial_deck)
     initial_deck_cp = initial_deck.copy()
 
+    print("Playing match using Monte Carlo simulation...")
     bankrolls_default = play_match(initial_deck, bankroll_default, num_simulations)
+    monte_carlo_results.extend(bankrolls_default)
+
+    print("Playing match using High-Low Counting...")
     bankrolls_count = simulate_full_match_count(initial_deck_cp, bankroll_count)
+    counting_results.extend(bankrolls_count)
+
 
     bankroll_default = bankrolls_default[-1]
     bankroll_count = bankrolls_count[-1]
 
     print("Bankrolls defaults:", bankroll_default)
     print("Bankrolls count:", bankroll_count)
+    print()
+
+
+# Graph the money afther the matches
+
+x = [i for i in range(len(counting_results))]
+# Create the plot
+plt.plot(counting_results, label="Counting", color="blue", linestyle="-")
+plt.plot(monte_carlo_results, label="Monte Carlo", color="green", linestyle="-")
+# plt.plot(x, counting_results, label="Monte Carlo", color="blue", linestyle="o")
+# plt.plot(x, monte_carlo_results, label="Counting Algorithm", color="green", linestyle="o")
+
+# Add labels, title, and legend
+plt.title("Money comparison")
+plt.xlabel("Entries")
+plt.ylabel("Money")
+plt.legend()
+plt.grid()
+
+# Show the plot
+plt.show()
