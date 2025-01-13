@@ -1,4 +1,17 @@
 import numpy as np
+card_count = 0
+# How much to bet based on the true count
+bet_percentage_bankroll = {
+    -3: 0.005,
+    -2: 0.01,
+    -1: 0.02, 
+    0: 0.03,
+    1: 0.05,
+    2: 0.1,
+    3: 0.2,
+    4: 0.3,
+    5: 0.4,
+}
 
 # perfect strategy tables
 hard_totals = {
@@ -35,10 +48,30 @@ soft_totals = {
     14: ['hit'] * 10,
     13: ['hit'] * 10,
 }
+# Gets card counting value based on HI-LO strategy
+def get_card_value(card):
+    if card < 7:
+        return 1
+    if card >= 10:
+        return -1
+    return 0
 
+def get_nr_decks(deck):
+    return np.ceil(len(deck) / 52)
+
+def get_bet_percentage_bankroll(card_count, deck):
+    global bet_percentage_bankroll
+    #true_count = card_count // get_nr_decks(deck)
+    true_count = card_count
+
+    if (true_count < -3):
+        return bet_percentage_bankroll[-3]
+    if (true_count > 5):
+        return bet_percentage_bankroll[5]
+    return bet_percentage_bankroll[true_count]
 
 # Function to simulate one blackjack hand
-def simulate_hand(deck, remove_from_deck):
+def simulate_hand(deck):
     def hand_value(hand):
         value = sum(hand)
         # Adjust for aces
@@ -51,26 +84,23 @@ def simulate_hand(deck, remove_from_deck):
         return value
 
     def dealer_play(deck, dealer_hand):
+        global card_count
         while hand_value(dealer_hand) < 17:
             dealt_card = deck.pop(0)
             dealer_hand.append(dealt_card)
-            if remove_from_deck:
-                initial_deck.remove(dealt_card)
+            card_count += get_card_value(dealer_hand[-1])
         return hand_value(dealer_hand)
 
-    if not remove_from_deck:
+    global card_count
+    # Converting to list if needed
+    if isinstance(deck, np.ndarray):
         deck = deck.tolist()
 
     # Deal hands
     player_hand = [deck.pop(0), deck.pop(0)]
     dealer_hand = [deck.pop(0), deck.pop(0)]
+    card_count = get_card_value(player_hand[0]) + get_card_value(player_hand[1]) + get_card_value(dealer_hand[0]) + get_card_value(dealer_hand[1])
 
-    # Remove dealt cards
-    if remove_from_deck:
-        for card in player_hand:
-            initial_deck.remove(card)
-        for card in dealer_hand:
-            initial_deck.remove(card)
 
     # check for blackjack -> has 3:2 returns
     if sum(player_hand) == 21:
@@ -98,10 +128,9 @@ def simulate_hand(deck, remove_from_deck):
         curr_move = hard_totals[player_value][up_card - 2]
 
     while curr_move == 'hit':
+        card_count += get_card_value(player_hand[-1])
         dealt_card = deck.pop(0)
         player_hand.append(dealt_card)
-        if remove_from_deck:
-            initial_deck.remove(dealt_card)
         player_value = hand_value(player_hand)
         if player_value > 21:
             # busted
@@ -128,6 +157,21 @@ def simulate_hand(deck, remove_from_deck):
         return -1  # Loss
 
 
+
+# Returns the results of each hand in the match
+def simulate_full_match_count(deck, bankroll):
+    global card_count
+    card_count = 0
+
+    bankrolls = []
+    # Keep simulating hands until there is not enough cards left in the deck
+    while len(deck) > 16:
+        bankroll += get_bet_percentage_bankroll(card_count, deck) * simulate_hand(deck)
+    
+        bankrolls.append(bankroll)
+
+    return bankrolls
+
 # Function for Monte Carlo Simulation
 def monte_carlo_blackjack(deck, num_simulations=1000):
     # max count of cards for a hand (1 player):
@@ -138,7 +182,7 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
 
     results = list()
     for curr_deck in decks:
-        results.append(simulate_hand(curr_deck, remove_from_deck=False))
+        results.append(simulate_hand(curr_deck))
 
     # print(results)
     results = np.array(results)
@@ -163,20 +207,22 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
     )
     return ev, var
 
-def play_match():
-    global initial_deck, num_simulations, bankroll
-    while len(initial_deck) > 16:
-        expected_value, variance = monte_carlo_blackjack(initial_deck, num_simulations)
+def play_match(deck, bankroll, num_simulations):
+    bankrolls = []
+    while len(deck) > 16:
+        expected_value, variance = monte_carlo_blackjack(deck, num_simulations)
         if expected_value > 0:
             bet_size = bankroll * (expected_value / variance)
         else:
             bet_size = 0
 
-        result = simulate_hand(initial_deck, remove_from_deck=True)
-        print(len(initial_deck))
-        print(initial_deck, result, expected_value)
+        result = simulate_hand(deck)
+        # print(len(deck))
+        # print(deck, result, expected_value)
         bankroll += bet_size * result
-        print(bankroll)
+        bankrolls.append(bankroll)
+
+    return bankrolls
 
 # Define parameters
 # epsilon = 0.01 -> 115377
@@ -184,7 +230,10 @@ def play_match():
 num_simulations = 115377
 num_hands = 100
 initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4 * 4
-bankroll = 100_000
+
+bankroll_default = 100_000
+bankroll_count = 100_000
+bet_sum_count = 1000
 
 # Run simulation and print results
 avg_ev = 0
@@ -205,4 +254,16 @@ min_ev = float('inf')
 print(f"Average var over {num_hands} hands: {avg_var / num_hands}")
 print(f"Max ev: {max_ev}, Min ev: {min_ev}")'''
 
-play_match()
+nr_matches = 1
+for _ in range(nr_matches):
+    np.random.shuffle(initial_deck)
+    initial_deck_cp = initial_deck.copy()
+
+    bankrolls_default = play_match(initial_deck, bankroll_default, num_simulations)
+    bankrolls_count = simulate_full_match_count(initial_deck_cp, bankroll_count)
+
+    bankroll_default = bankrolls_default[-1]
+    bankroll_count = bankrolls_count[-1]
+
+    print("Bankrolls defaults:", bankroll_default)
+    print("Bankrolls count:", bankroll_count)
