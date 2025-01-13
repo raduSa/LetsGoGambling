@@ -2,13 +2,13 @@
 
 ## Contents
 
-1. [Blackjack](##Blackjack)
-2. [Playing Strategy](##Playing-Strategy)
-3. [Chernoff-Hoeffding Inequality](##Chernoff-Hoeffding-Inequality)
-4. [Monte Carlo](##Monte-Carlo)
-5. [Bet sizing](##Bet-sizing)
-6. [The Results](##The-Results)
-7. [References](##References)
+1. [Blackjack](#Blackjack)
+2. [Playing Strategy](#Playing-Strategy)
+3. [Chernoff-Hoeffding Inequality](#Chernoff-Hoeffding-Inequality)
+4. [Monte Carlo](#Monte-Carlo)
+5. [Bet sizing](#Bet-sizing)
+6. [The Results](#The-Results)
+7. [References](#References)
 
 ## Blackjack
 
