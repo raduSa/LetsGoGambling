@@ -94,6 +94,16 @@ The crux of High Low is the following:
 You start your count at 0 if the card dealt is between [2-6] you add +1 if it is
 between [7-9] you add 0 and if it is between [10-A] you add -1.
 
+![Money Comparison](./assets/money_comparison.png)
+
+In the end the High-Low counting seems to have a better result, while the
+Monte Carlo simulation seems to lose more money.
+
+![Expected value](./assets/expected_value_by_sim.png)
+
+Altough Monte Carlo loses more money it looks like it approaches the
+expected value of -0.02 fast.
+
 ## References
 
 - https://wizardofodds.com/gambling/kelly-criterion/
