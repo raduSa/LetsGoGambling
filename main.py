@@ -38,7 +38,7 @@ soft_totals = {
 
 
 # Function to simulate one blackjack hand
-def simulate_hand(deck):
+def simulate_hand(deck, remove_from_deck):
     def hand_value(hand):
         value = sum(hand)
         # Adjust for aces
@@ -52,14 +52,25 @@ def simulate_hand(deck):
 
     def dealer_play(deck, dealer_hand):
         while hand_value(dealer_hand) < 17:
-            dealer_hand.append(deck.pop(0))
+            dealt_card = deck.pop(0)
+            dealer_hand.append(dealt_card)
+            if remove_from_deck:
+                initial_deck.remove(dealt_card)
         return hand_value(dealer_hand)
 
-    deck = deck.tolist()
+    if not remove_from_deck:
+        deck = deck.tolist()
 
     # Deal hands
     player_hand = [deck.pop(0), deck.pop(0)]
     dealer_hand = [deck.pop(0), deck.pop(0)]
+
+    # Remove dealt cards
+    if remove_from_deck:
+        for card in player_hand:
+            initial_deck.remove(card)
+        for card in dealer_hand:
+            initial_deck.remove(card)
 
     # check for blackjack -> has 3:2 returns
     if sum(player_hand) == 21:
@@ -87,7 +98,10 @@ def simulate_hand(deck):
         curr_move = hard_totals[player_value][up_card - 2]
 
     while curr_move == 'hit':
-        player_hand.append(deck.pop(0))
+        dealt_card = deck.pop(0)
+        player_hand.append(dealt_card)
+        if remove_from_deck:
+            initial_deck.remove(dealt_card)
         player_value = hand_value(player_hand)
         if player_value > 21:
             # busted
@@ -124,7 +138,7 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
 
     results = list()
     for curr_deck in decks:
-        results.append(simulate_hand(curr_deck))
+        results.append(simulate_hand(curr_deck, remove_from_deck=False))
 
     # print(results)
     results = np.array(results)
@@ -149,13 +163,27 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
     )
     return ev, var
 
+def play_match():
+    global initial_deck, num_simulations, bankroll
+    while len(initial_deck) > 16:
+        expected_value, variance = monte_carlo_blackjack(initial_deck, num_simulations)
+        if expected_value > 0:
+            bet_size = bankroll * (expected_value / variance)
+        else:
+            bet_size = 0
+
+        result = simulate_hand(initial_deck, remove_from_deck=True)
+        print(len(initial_deck))
+        print(initial_deck, result, expected_value)
+        bankroll += bet_size * result
+        print(bankroll)
 
 # Define parameters
 # epsilon = 0.01 -> 115377
 # epsilon = 0.1 -> 1153
 num_simulations = 115377
 num_hands = 100
-initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4
+initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4 * 4
 bankroll = 100_000
 
 # Run simulation and print results
@@ -163,7 +191,7 @@ avg_ev = 0
 avg_var = 0
 max_ev = -1
 min_ev = float('inf')
-for _ in range(num_hands):
+'''for _ in range(num_hands):
     expected_value, variance = monte_carlo_blackjack(initial_deck, num_simulations)
     max_ev = max(max_ev, expected_value)
     min_ev = min(min_ev, expected_value)
@@ -171,8 +199,10 @@ for _ in range(num_hands):
     avg_var += variance
     print(f"ev: {expected_value}, var: {variance}")
     print(f"Expected Value of the Next Bet: {bankroll * expected_value / variance}")
-    print()
+    print()'''
 
-print(f"Average ev over {num_hands} hands: {avg_ev / num_hands}")
+'''print(f"Average ev over {num_hands} hands: {avg_ev / num_hands}")
 print(f"Average var over {num_hands} hands: {avg_var / num_hands}")
-print(f"Max ev: {max_ev}, Min ev: {min_ev}")
+print(f"Max ev: {max_ev}, Min ev: {min_ev}")'''
+
+play_match()
