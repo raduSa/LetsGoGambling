@@ -2,13 +2,13 @@
 
 ## Contents
 
-1. [Blackjack](##-Blackjack)
-2. [Playing Strategy](##-Playing-Strategy)
-3. [Chernoff-Hoeffding Inequality](##-Chernoff-Hoeffding-Inequality)
-4. [Monte Carlo](##-Monte-Carlo)
-5. [Bet sizing](##-Bet-sizing)
-6. [The Results](##-The-Results)
-7. [References](##-References)
+1. [Blackjack](##Blackjack)
+2. [Playing Strategy](##Playing-Strategy)
+3. [Chernoff-Hoeffding Inequality](##Chernoff-Hoeffding-Inequality)
+4. [Monte Carlo](##Monte-Carlo)
+5. [Bet sizing](##Bet-sizing)
+6. [The Results](##The-Results)
+7. [References](##References)
 
 ## Blackjack
 
@@ -116,7 +116,8 @@ between [7-9] you add 0 and if it is between [10-A] you add -1.
 ![Money Comparison](./assets/money_comparison.png)
 
 In the end the High-Low counting seems to have a better result, while the
-Monte Carlo simulation seems to lose more money.
+Monte Carlo simulation seems to lose more money, but if we play more matches
+in the long run Monte Carlo will catchup and will actually be better.
 
 ![Expected value](./assets/expected_value_by_sim.png)
 
