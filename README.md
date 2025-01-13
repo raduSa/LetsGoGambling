@@ -57,11 +57,11 @@ So for an accurate result will need to do 115377 simulations (we used epsilon = 
 
 ## Monte Carlo
 
-Use are using Monte Carlo to compute the next amount of money we should
+We are using Monte Carlo to compute the next amount of money we should
 bet when we will play on the next hand.
 
-The computation runs a certian amount of simulations by playing a hand
-using the "basic strategy" and using the outcomes (Win, Lose, Tie, Balckjack)
+The computation runs a certain amount of simulations by playing a hand
+using the "basic strategy" and using the outcomes (Win, Lose, Tie, Blackjack)
 to compute the equivalent expected value and variation of that hand.
 
 ## Bet sizing
@@ -105,7 +105,8 @@ w & j & t & q
 \end{pmatrix}
 $$
 
-Certainty Equivalent (CE) provides a way to compare different bets.
+Q5: What is the optimal bet size?
+A5: Certainty Equivalent (CE) provides a way to compare different bets.
 The bet with the highest CE is the one you want to make, unless all bets have a
 negative CE in which case you should not bet at all. For a typical hand of blackjack,
 the amount you expect to win, on average, is some advantage "a" times the amount
@@ -126,7 +127,7 @@ Also notice that for an optimal bet the CE is precisely half the expected winnin
 This will be discussed in more detail below.
 
 So in this case we will use Ev / Var to choose our bet percentage as it is a good
-approxmiation.
+approximation.
 
 ## The Results
 
@@ -141,12 +142,13 @@ between [7-9] you add 0 and if it is between [10-A] you add -1.
 
 In the end the High-Low counting seems to have a better result, while the
 Monte Carlo simulation seems to lose more money, but if we play more matches
-in the long run Monte Carlo will catchup and will actually be better.
+in the long run Monte Carlo will catch up and will actually be better.
 
 ![Expected value](./assets/expected_value_by_sim.png)
 
-Altough Monte Carlo loses more money it looks like it approaches the
-expected value of -0.02 fast.
+We can see that as we move close and beyond our number of simulations
+115377 we are getting closer and closer to the desired edge whereas in the beginning
+we were further apart.
 
 ## References
 
