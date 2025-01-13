@@ -144,6 +144,10 @@ In the beginning the High-Low counting seems to have a better result, while the
 Monte Carlo simulation seems to lose more money, but if we play more matches
 in the long run Monte Carlo will catch up and will actually be better.
 
+![Expected value](./assets/money_comparison_longrun.png)
+
+Here are the results after playing 100 matches of BlackJack, using the 2 different algorithms.
+
 ![Expected value](./assets/expected_value_by_sim.png)
 
 We can see that as we move close and beyond our number of simulations
