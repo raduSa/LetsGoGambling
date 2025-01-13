@@ -226,6 +226,43 @@ def play_match(deck, bankroll, num_simulations):
 
     return bankrolls
 
+
+def plot_by_bank_results(monte_carlo_results, counting_results):
+    # Graph the money afther the matches
+    plt.plot(counting_results, label="Counting", color="blue", linestyle="-")
+    plt.plot(monte_carlo_results, label="Monte Carlo", color="green", linestyle="-")
+
+    plt.title("Money comparison")
+    plt.xlabel("Entries")
+    plt.ylabel("Money")
+    plt.legend()
+    plt.grid()
+
+    plt.show()
+
+
+def plot_by_nr_simulations():
+    num_simulations =  np.linspace(10_000, 115_777, 1000).astype(int)
+    expected_values = []
+    variances = []
+
+    for num_sim in num_simulations:
+        expected_value, variance = monte_carlo_blackjack(initial_deck, num_sim)
+        expected_values.append(expected_value)
+        variances.append(variance)
+
+    plt.plot(num_simulations, expected_values, label='Expected Value')
+
+    plt.xlabel('Number of Simulations')
+    plt.ylabel('Player edge')
+
+    plt.axhline(-0.025, color='r', linestyle='-', label='Theoretical edge')
+    plt.title('Expected Value by Number of Simulations')
+
+    plt.legend()
+    plt.savefig('assets/expected_value_by_sim.png')
+    plt.show()
+
 # Define parameters
 # epsilon = 0.01 -> 115377
 # epsilon = 0.1 -> 1153
@@ -274,30 +311,9 @@ for i in range(nr_matches):
     bankrolls_count = simulate_full_match_count(initial_deck_cp, bankroll_count)
     counting_results.extend(bankrolls_count)
 
-
-    bankroll_default = bankrolls_default[-1]
-    bankroll_count = bankrolls_count[-1]
-
     print("Bankrolls defaults:", bankroll_default)
     print("Bankrolls count:", bankroll_count)
     print()
 
-
-# Graph the money afther the matches
-
-x = [i for i in range(len(counting_results))]
-# Create the plot
-plt.plot(counting_results, label="Counting", color="blue", linestyle="-")
-plt.plot(monte_carlo_results, label="Monte Carlo", color="green", linestyle="-")
-# plt.plot(x, counting_results, label="Monte Carlo", color="blue", linestyle="o")
-# plt.plot(x, monte_carlo_results, label="Counting Algorithm", color="green", linestyle="o")
-
-# Add labels, title, and legend
-plt.title("Money comparison")
-plt.xlabel("Entries")
-plt.ylabel("Money")
-plt.legend()
-plt.grid()
-
-# Show the plot
-plt.show()
+plot_by_bank_results(monte_carlo_results, counting_results)
+plot_by_nr_simulations()
