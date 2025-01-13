@@ -1,5 +1,15 @@
 # LetsGoGambling
 
+## Contents
+
+1. [Blackjack](##Blackjack)
+2. [Playing Strategy](##Playing-Strategy)
+3. [Chernoff-Hoeffding Inequality](##Chernoff-Hoeffding-Inequality)
+4. [Monte Carlo](##Monte-Carlo)
+5. [Bet sizing](##Bet-sizing)
+6. [The Results](##The-Results)
+7. [References](##References)
+
 ## Blackjack
 
 We will simulate the game of Blackjack with one player and the dealer for simplicity. There will be no additional players in this version.
@@ -23,7 +33,9 @@ about hard and soft hands.
 Our playing strategy dates back to 1950, when the Four Horsemen of the Apocalypse
 (a group of U.S. Army engineers) first discovered the optimal playing strategy for Blackjack.
 
-Later, this strategy was refined using computers and combinatorial analysis, achieving the smallest possible monetary loss in the long run.
+Later, this strategy was refined using computers and combinatorial analysis,
+achieving the smallest possible monetary loss in the long run. This strategy
+is also known as "The Basic Strategy" in Blackjack.
 
 Below is a guide for the decisions you should make based on your count value and the dealer's upcard:
 <img src="https://i.bojoko.com/25/c7e2777d_1000x1330.876e5ac5f344d22c4b27d59d1b8ae5d8/blackjack-basic-strategy-chart.png" alt="strategy" width="700"/>
@@ -44,6 +56,13 @@ $$
 So for an accurate result will need to do 115377 simulations (we used epsilon = 0.01 and p = 0.95).
 
 ## Monte Carlo
+
+Use are using Monte Carlo to compute the next amount of money we should
+bet when we will play on the next hand.
+
+The computation runs a certian amount of simulations by playing a hand
+using the "basic strategy" and using the outcomes (Win, Lose, Tie, Balckjack)
+to compute the equivalent expected value and variation of that hand.
 
 ## Bet sizing
 
