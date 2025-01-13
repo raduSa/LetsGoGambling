@@ -1,6 +1,38 @@
 # LetsGoGambling
 
-# Chernoff-Hoeffding Inequality
+## Blackjack
+
+We will simulate the game of Blackjack with one player and the dealer for simplicity. There will be no additional players in this version.
+
+In our game, the player has only two actions: stand or hit. The outcomes of each game are: lose, win, tie, or blackjack.
+
+- A loss (-1): You lose all the money you bet.
+- A win (+1): You gain an amount equal to your bet.
+- A tie (0): You neither gain nor lose money.
+- A blackjack (1.5): You win 3/2 of your bet.
+
+J, Q, K and worth 10 points, Ace can be either 11 or 1.
+
+Also as long as the dealer has a count value < 17 he HAS to hit.
+
+## Playing Strategy
+
+We only care about hit and stand (double can be either hit or stand) and only
+about hard and soft hands.
+
+Our playing strategy dates back to 1950, when the Four Horsemen of the Apocalypse
+(a group of U.S. Army engineers) first discovered the optimal playing strategy for Blackjack.
+
+Later, this strategy was refined using computers and combinatorial analysis, achieving the smallest possible monetary loss in the long run.
+
+Below is a guide for the decisions you should make based on your count value and the dealer's upcard:
+<img src="https://i.bojoko.com/25/c7e2777d_1000x1330.876e5ac5f344d22c4b27d59d1b8ae5d8/blackjack-basic-strategy-chart.png" alt="strategy" width="700"/>
+
+We focus only on hit and stand decisions (treating double as either hit or stand) and consider only hard and soft hands.
+
+## Chernoff-Hoeffding Inequality
+
+To determine how many simulations our Monte Carlo simulation needs for a reasonable result, we used the Chernoff-Hoeffding Inequality:
 
 $$
 P(|S_n - p| < \epsilon) \geq 1 - 2 * \exp {\frac{-2 * n * \epsilon ^ 2}{(1.5 - (-1)) ^ 2}} \Leftrightarrow
@@ -8,9 +40,15 @@ $$
 $$
 \Leftrightarrow n > - \frac {\ln {\frac {1 - \alpha}{2}} * 6.25}{2 * \epsilon ^ 2} \approx 1153
 $$
-# Bet sizing
 
-Since losing the bet means losing the entire wager, we can use the following formula given by the Kelly criterion:
+So for an accurate result will need to do 1153 simulations.
+
+## Monte Carlo
+
+## Bet sizing
+
+If we were to play Blackjack and we could only lose everything or win the
+amount we betted (b >= 1) we could use Kelly criterion to choose our bet size:
 
 $$
 f^* = p - \frac{p}{q}
@@ -34,7 +72,7 @@ $$
 \text{And } f^* = \frac {E[X]}{b}
 $$
 
-But for a hand of blackjack it looks like this:
+But in our case a hand of Blackjack looks like this:
 
 $$
 X'  \ \textasciitilde \ 
@@ -44,10 +82,21 @@ w & j & t & q
 \end{pmatrix}
 $$
 
-We will use the formula for the bet percentage: Ev / Var , as it is a good approximation
+So in this case we will use Ev / Var to choose our bet percentage as it is a good
+approxmiation.
 
-# References
+## The Results
+
+Besides the Monte Carlo simulation we have also implemented a High Low counting
+strategy to compare the two.
+
+The crux of High Low is the following:
+You start your count at 0 if the card dealt is between [2-6] you add +1 if it is
+between [7-9] you add 0 and if it is between [10-A] you add -1.
+
+## References
 
 - https://wizardofodds.com/gambling/kelly-criterion/
 - https://www.blackjackreview.com/wp/archives/red-taylor-kelly-criterion-faq/
 - https://graphics.stanford.edu/~billyc/class/vis_win0304/as2/
+- https://i.bojoko.com/25/c7e2777d_1000x1330.876e5ac5f344d22c4b27d59d1b8ae5d8/blackjack-basic-strategy-chart.png
