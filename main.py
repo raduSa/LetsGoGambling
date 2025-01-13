@@ -168,7 +168,6 @@ def simulate_full_match_count(deck, bankroll):
     # Keep simulating hands until there is not enough cards left in the deck
     while len(deck) > 16:
         bankroll += get_bet_percentage_bankroll(card_count, deck) * simulate_hand(deck)
-    
         bankrolls.append(bankroll)
 
     return bankrolls
@@ -196,7 +195,7 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
     p_loss = losses / num_simulations
     p_blackjack = blackjack / num_simulations
     p_tie = ties / num_simulations
-    print(f"Wins: {wins}, Losses: {losses}, BlackJacks: {blackjack}")
+    #print(f"Wins: {wins}, Losses: {losses}, BlackJacks: {blackjack}")
 
     # Calculate expected value
     ev = np.sum(results) / num_simulations
@@ -208,7 +207,7 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
     )
     return ev, var
 
-def play_match(deck, bankroll, num_simulations):
+def play_match(deck, bankroll, num_simulations=10000):
     bankrolls = []
     while len(deck) > 16:
         expected_value, variance = monte_carlo_blackjack(deck, num_simulations)
@@ -252,7 +251,6 @@ def plot_by_nr_simulations():
 # epsilon = 0.1 -> 1153
 num_simulations = 115377
 num_hands = 100
-initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4 * 4
 
 bankroll_default = 100_000
 bankroll_count = 100_000
@@ -277,17 +275,21 @@ min_ev = float('inf')
 print(f"Average var over {num_hands} hands: {avg_var / num_hands}")
 print(f"Max ev: {max_ev}, Min ev: {min_ev}")'''
 
-nr_matches = 1
-# for _ in range(nr_matches):
-#     np.random.shuffle(initial_deck)
-#     initial_deck_cp = initial_deck.copy()
+nr_matches = 100
+print("Initial bankroll:", bankroll_default)
+print("Number of matches:", nr_matches)
+print("Starting matches!!!")
+for _ in range(nr_matches):
+    initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4 * 4
+    np.random.shuffle(initial_deck)
+    initial_deck_cp = initial_deck.copy()
 
-#     bankrolls_default = play_match(initial_deck, bankroll_default, num_simulations)
-#     bankrolls_count = simulate_full_match_count(initial_deck_cp, bankroll_count)
+    bankrolls_default = play_match(initial_deck, bankroll_default, num_simulations)
+    bankrolls_count = simulate_full_match_count(initial_deck_cp, bankroll_count)
 
-#     bankroll_default = bankrolls_default[-1]
-#     bankroll_count = bankrolls_count[-1]
+    bankroll_default = bankrolls_default[-1]
+    bankroll_count = bankrolls_count[-1]
 
-#     print("Bankrolls defaults:", bankroll_default)
-#     print("Bankrolls count:", bankroll_count)
-plot_by_nr_simulations()
+    print("Match results:")
+    print(" Bankrolls defaults:", bankroll_default)
+    print(" Bankrolls count:", bankroll_count)
