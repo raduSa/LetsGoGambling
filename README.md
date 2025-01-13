@@ -1,5 +1,7 @@
 # LetsGoGambling
+
 # Chernoff-Hoeffding Inequality
+
 $$
 P(|S_n - p| < \epsilon) \geq 1 - 2 * \exp {\frac{-2 * n * \epsilon ^ 2}{(1.5 - (-1)) ^ 2}} \Leftrightarrow
 $$
@@ -7,13 +9,16 @@ $$
 \Leftrightarrow n > - \frac {\ln {\frac {1 - \alpha}{2}} * 6.25}{2 * \epsilon ^ 2} \approx 1153
 $$
 # Bet sizing
-Since losing the bet means losing the entire wager, we use can use the following formula given by the Kelly criterion:
+
+Since losing the bet means losing the entire wager, we can use the following formula given by the Kelly criterion:
 
 $$
 f^* = p - \frac{p}{q}
 $$
 
-p is the probability of winning, q = 1 - p and b is the proportion of the bet gained for a win
+- p is the probability of winning
+- q = 1 - p
+- b is the proportion of the bet gained for a win
 
 In this case, we would have a random variable that looks like this:
 
@@ -41,5 +46,8 @@ $$
 
 We will use the formula for the bet percentage: Ev / Var , as it is a good approximation
 
-https://wizardofodds.com/gambling/kelly-criterion/
-https://www.blackjackreview.com/wp/archives/red-taylor-kelly-criterion-faq/
+# References
+
+- https://wizardofodds.com/gambling/kelly-criterion/
+- https://www.blackjackreview.com/wp/archives/red-taylor-kelly-criterion-faq/
+- https://graphics.stanford.edu/~billyc/class/vis_win0304/as2/

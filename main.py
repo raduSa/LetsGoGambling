@@ -1,49 +1,39 @@
-'''
-TODO:
-calculate the player advantage for the next hand using Monte Carlo simulations
-print the estimated player advantage and the best bet value
-graph it alongside player advantage given by High-Low card counting over
-the course of a n deck shoe
-'''
-
-import random
-from copy import deepcopy
 import numpy as np
 
 # perfect strategy tables
 hard_totals = {
-    21: ['s'] * 10,
-    20: ['s'] * 10,
-    19: ['s'] * 10,
-    18: ['s'] * 10,
-    17: ['s'] * 10,
-    16: ['s'] * 5 + ['h'] * 5,
-    15: ['s'] * 5 + ['h'] * 5,
-    14: ['s'] * 5 + ['h'] * 5,
-    13: ['s'] * 5 + ['h'] * 5,
-    12: ['h'] * 2 + ['s'] * 3 + ['h'] * 5,
-    11: ['h'] * 10,
-    10: ['h'] * 10,
-    9: ['h'] * 10,
-    8: ['h'] * 10,
-    7: ['h'] * 10,
-    6: ['h'] * 10,
-    5: ['h'] * 10,
-    4: ['h'] * 10,
-    3: ['h'] * 10,
-    2: ['h'] * 10,
+    21: ['stay'] * 10,
+    20: ['stay'] * 10,
+    19: ['stay'] * 10,
+    18: ['stay'] * 10,
+    17: ['stay'] * 10,
+    16: ['stay'] * 5 + ['hit'] * 5,
+    15: ['stay'] * 5 + ['hit'] * 5,
+    14: ['stay'] * 5 + ['hit'] * 5,
+    13: ['stay'] * 5 + ['hit'] * 5,
+    12: ['hit'] * 2 + ['stay'] * 3 + ['hit'] * 5,
+    11: ['hit'] * 10,
+    10: ['hit'] * 10,
+    9: ['hit'] * 10,
+    8: ['hit'] * 10,
+    7: ['hit'] * 10,
+    6: ['hit'] * 10,
+    5: ['hit'] * 10,
+    4: ['hit'] * 10,
+    3: ['hit'] * 10,
+    2: ['hit'] * 10,
 }
 
 soft_totals = {
-    21: ['s'] * 10,
-    20: ['s'] * 10,
-    19: ['s'] * 10,
-    18: ['s'] * 7 + ['h'] * 3,
-    17: ['h'] * 10,
-    16: ['h'] * 10,
-    15: ['h'] * 10,
-    14: ['h'] * 10,
-    13: ['h'] * 10,
+    21: ['stay'] * 10,
+    20: ['stay'] * 10,
+    19: ['stay'] * 10,
+    18: ['stay'] * 7 + ['hit'] * 3,
+    17: ['hit'] * 10,
+    16: ['hit'] * 10,
+    15: ['hit'] * 10,
+    14: ['hit'] * 10,
+    13: ['hit'] * 10,
 }
 
 
@@ -78,26 +68,25 @@ def simulate_hand(deck):
         else:
             return 1.5
 
-    # save dealers up-card -> matters for playing perfect strategy
-    up_card = dealer_hand[0]
-
     # check if player hand is soft total
     # if the hand has an ace that can be counted as an 11, it is a soft total
     # otherwise the hand is a hard total
     is_soft_total = (11 in player_hand and sum(player_hand) <= 21)
 
     # Player plays
-
     player_value = hand_value(player_hand)
 
-    #print(player_hand, player_value)
+    # print(player_hand, player_value)
+
+    # save dealers up-card -> matters for playing perfect strategy
+    up_card = dealer_hand[0]
 
     if is_soft_total:
         curr_move = soft_totals[player_value][up_card - 2]
     else:
         curr_move = hard_totals[player_value][up_card - 2]
 
-    while curr_move == 'h':
+    while curr_move == 'hit':
         player_hand.append(deck.pop(0))
         player_value = hand_value(player_hand)
         if player_value > 21:
@@ -137,7 +126,7 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
     for curr_deck in decks:
         results.append(simulate_hand(curr_deck))
 
-    #print(results)
+    # print(results)
     results = np.array(results)
 
     wins = np.count_nonzero(results == 1)
@@ -149,6 +138,7 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
     p_blackjack = blackjack / num_simulations
     p_tie = ties / num_simulations
     print(f"Wins: {wins}, Losses: {losses}, BlackJacks: {blackjack}")
+
     # Calculate expected value
     ev = np.sum(results) / num_simulations
     var = (
@@ -160,29 +150,29 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
     return ev, var
 
 
-
 # Define parameters
 # epsilon = 0.01 -> 115377
 # epsilon = 0.1 -> 1153
 num_simulations = 115377
 num_hands = 100
 initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4
-bankroll = 100000
+bankroll = 100_000
 
 # Run simulation and print results
 avg_ev = 0
 avg_var = 0
-Max = -1
-Min = float('inf')
+max_ev = -1
+min_ev = float('inf')
 for _ in range(num_hands):
     expected_value, variance = monte_carlo_blackjack(initial_deck, num_simulations)
-    Max = max(Max, expected_value)
-    Min = min(Min, expected_value)
+    max_ev = max(max_ev, expected_value)
+    min_ev = min(min_ev, expected_value)
     avg_ev += expected_value
     avg_var += variance
     print(f"ev: {expected_value}, var: {variance}")
     print(f"Expected Value of the Next Bet: {bankroll * expected_value / variance}")
+    print()
 
 print(f"Average ev over {num_hands} hands: {avg_ev / num_hands}")
 print(f"Average var over {num_hands} hands: {avg_var / num_hands}")
-print(f"Max: {Max}, Min: {Min}")
+print(f"Max ev: {max_ev}, Min ev: {min_ev}")
