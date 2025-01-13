@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
 card_count = 0
 # How much to bet based on the true count
 bet_percentage_bankroll = {
@@ -195,7 +196,7 @@ def monte_carlo_blackjack(deck, num_simulations=1000):
     p_loss = losses / num_simulations
     p_blackjack = blackjack / num_simulations
     p_tie = ties / num_simulations
-    #print(f"Wins: {wins}, Losses: {losses}, BlackJacks: {blackjack}")
+    # print(f"Wins: {wins}, Losses: {losses}, BlackJacks: {blackjack}")
 
     # Calculate expected value
     ev = np.sum(results) / num_simulations
@@ -224,6 +225,22 @@ def play_match(deck, bankroll, num_simulations=10000):
 
     return bankrolls
 
+
+def plot_by_bank_results(monte_carlo_results, counting_results):
+    # Graph the money afther the matches
+    plt.plot(counting_results, label="Counting", color="blue", linestyle="-")
+    plt.plot(monte_carlo_results, label="Monte Carlo", color="green", linestyle="-")
+
+    plt.title("Money comparison")
+    plt.xlabel("Entries")
+    plt.ylabel("Money")
+    plt.legend()
+    plt.grid()
+
+    plt.savefig('assets/money_comparison.png')
+    plt.show()
+
+
 def plot_by_nr_simulations():
     num_simulations =  np.linspace(10_000, 115_777, 1000).astype(int)
     expected_values = []
@@ -235,13 +252,13 @@ def plot_by_nr_simulations():
         variances.append(variance)
 
     plt.plot(num_simulations, expected_values, label='Expected Value')
-    
+
     plt.xlabel('Number of Simulations')
     plt.ylabel('Player edge')
-    
+
     plt.axhline(-0.025, color='r', linestyle='-', label='Theoretical edge')
     plt.title('Expected Value by Number of Simulations')
-    
+
     plt.legend()
     plt.savefig('assets/expected_value_by_sim.png')
     plt.show()
@@ -252,44 +269,35 @@ def plot_by_nr_simulations():
 num_simulations = 115377
 num_hands = 100
 
+counting_results = []
+monte_carlo_results = []
+
+nr_matches = 5
 bankroll_default = 100_000
 bankroll_count = 100_000
 bet_sum_count = 1000
-
-# Run simulation and print results
-avg_ev = 0
-avg_var = 0
-max_ev = -1
-min_ev = float('inf')
-'''for _ in range(num_hands):
-    expected_value, variance = monte_carlo_blackjack(initial_deck, num_simulations)
-    max_ev = max(max_ev, expected_value)
-    min_ev = min(min_ev, expected_value)
-    avg_ev += expected_value
-    avg_var += variance
-    print(f"ev: {expected_value}, var: {variance}")
-    print(f"Expected Value of the Next Bet: {bankroll * expected_value / variance}")
-    print()'''
-
-'''print(f"Average ev over {num_hands} hands: {avg_ev / num_hands}")
-print(f"Average var over {num_hands} hands: {avg_var / num_hands}")
-print(f"Max ev: {max_ev}, Min ev: {min_ev}")'''
-
-nr_matches = 100
-print("Initial bankroll:", bankroll_default)
-print("Number of matches:", nr_matches)
-print("Starting matches!!!")
-for _ in range(nr_matches):
+for i in range(nr_matches):
+    print(f"Playing match: [{i}]")
     initial_deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11] * 4 * 4
+
     np.random.shuffle(initial_deck)
     initial_deck_cp = initial_deck.copy()
 
+    print("Playing match using Monte Carlo simulation...")
     bankrolls_default = play_match(initial_deck, bankroll_default, num_simulations)
-    bankrolls_count = simulate_full_match_count(initial_deck_cp, bankroll_count)
-
     bankroll_default = bankrolls_default[-1]
-    bankroll_count = bankrolls_count[-1]
+    monte_carlo_results.extend(bankrolls_default)
 
-    print("Match results:")
-    print(" Bankrolls defaults:", bankroll_default)
-    print(" Bankrolls count:", bankroll_count)
+    print("Playing match using High-Low Counting...")
+    bankrolls_count = simulate_full_match_count(initial_deck_cp, bankroll_count)
+    bankroll_count = bankrolls_count[-1]
+    counting_results.extend(bankrolls_count)
+
+    print("Bankrolls defaults:", bankroll_default)
+    print("Bankrolls count:", bankroll_count)
+
+
+    print()
+
+plot_by_bank_results(monte_carlo_results, counting_results)
+plot_by_nr_simulations()
