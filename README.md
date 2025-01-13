@@ -140,7 +140,7 @@ between [7-9] you add 0 and if it is between [10-A] you add -1.
 
 ![Money Comparison](./assets/money_comparison.png)
 
-In the end the High-Low counting seems to have a better result, while the
+In the beginning the High-Low counting seems to have a better result, while the
 Monte Carlo simulation seems to lose more money, but if we play more matches
 in the long run Monte Carlo will catch up and will actually be better.
 
