@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 card_count = 0
 # How much to bet based on the true count
 bet_percentage_bankroll = {
@@ -224,6 +225,28 @@ def play_match(deck, bankroll, num_simulations):
 
     return bankrolls
 
+def plot_by_nr_simulations():
+    num_simulations =  np.linspace(10_000, 115_777, 1000).astype(int)
+    expected_values = []
+    variances = []
+
+    for num_sim in num_simulations:
+        expected_value, variance = monte_carlo_blackjack(initial_deck, num_sim)
+        expected_values.append(expected_value)
+        variances.append(variance)
+
+    plt.plot(num_simulations, expected_values, label='Expected Value')
+    
+    plt.xlabel('Number of Simulations')
+    plt.ylabel('Player edge')
+    
+    plt.axhline(-0.025, color='r', linestyle='-', label='Theoretical edge')
+    plt.title('Expected Value by Number of Simulations')
+    
+    plt.legend()
+    plt.savefig('assets/expected_value_by_sim.png')
+    plt.show()
+
 # Define parameters
 # epsilon = 0.01 -> 115377
 # epsilon = 0.1 -> 1153
@@ -255,15 +278,16 @@ print(f"Average var over {num_hands} hands: {avg_var / num_hands}")
 print(f"Max ev: {max_ev}, Min ev: {min_ev}")'''
 
 nr_matches = 1
-for _ in range(nr_matches):
-    np.random.shuffle(initial_deck)
-    initial_deck_cp = initial_deck.copy()
+# for _ in range(nr_matches):
+#     np.random.shuffle(initial_deck)
+#     initial_deck_cp = initial_deck.copy()
 
-    bankrolls_default = play_match(initial_deck, bankroll_default, num_simulations)
-    bankrolls_count = simulate_full_match_count(initial_deck_cp, bankroll_count)
+#     bankrolls_default = play_match(initial_deck, bankroll_default, num_simulations)
+#     bankrolls_count = simulate_full_match_count(initial_deck_cp, bankroll_count)
 
-    bankroll_default = bankrolls_default[-1]
-    bankroll_count = bankrolls_count[-1]
+#     bankroll_default = bankrolls_default[-1]
+#     bankroll_count = bankrolls_count[-1]
 
-    print("Bankrolls defaults:", bankroll_default)
-    print("Bankrolls count:", bankroll_count)
+#     print("Bankrolls defaults:", bankroll_default)
+#     print("Bankrolls count:", bankroll_count)
+plot_by_nr_simulations()
